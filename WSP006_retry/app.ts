@@ -2,26 +2,54 @@ import express, { } from "express"
 import { Request, Response, NextFunction } from "express";
 import path from "path"
 import {loggerMiddleware} from "./middleware";
-import expressSession from "express-session";
+import expressSession, { MemoryStore } from "express-session";
+import jsonfile from "jsonfile"; 
+
+
+declare module "express-session" {
+  interface SessionData {
+    name?: string;
+    counter?: any;
+  }
+}
 
 const app = express();
 const PORT = 8080;
-
+const memo = [
+  {name: "spongebob"},
+  {name: "squarepants"}
+]
 app.use(express.urlencoded());
-// app.use(express.json());
+app.use(express.json());
 app.use(loggerMiddleware);
 
-app.get(" /hi", (req: Request, res:Response) => {
-    res.send("hello world");
-  });
+
+
+ 
+74.                                        
+app.get('/memo', (res,req) => {
+  req.json(memo)
+})
+
+
+
+app.use("/image", express.static("upload"));
+
+// app.get(" /hi", (req: Request, res:Response) => {
+//     res.send("hello world");
+//   });
   app.use(express.static("public")); 
 
-  app.post("/memo", (req, res)=> {
+  
+//create a memo
+  // app.post("/memo", async (req, res)=> {
 
-    console.log("post request to memo")
-    console.log("check body", + req.body)
-    res.send("returned from /memo post route handler")
-  });
+  //   console.log("post request to memo")
+  //   await jsonfile.writeFile(path.resolve('./memo.json'), Memor, {spaces: 4})
+  //   // console.log("check body", + req.body)
+   
+  //   res.send("returned from /memo post route handler")
+  // });
 
 
   app.use( expressSession ({
@@ -43,14 +71,11 @@ app.get(" /hi", (req: Request, res:Response) => {
     next();
   }) 
 
-declare module "express-session" {
-  interface SessionData {
-    name?: string;
-    counter?: any;
-  }
-}
 
-app.use("/image", express.static("upload"));
+
+
+
+
 
 app.use((req: Request, res: Response) => {
     res.status(404).sendFile(path.resolve("./public/404.html"));
